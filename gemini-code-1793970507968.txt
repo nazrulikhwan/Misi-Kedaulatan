@@ -1,0 +1,768 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Misi Kedaulatan Malaysia - Bahagian A</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+    <!-- Canvas Confetti -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%);
+            color: #f8fafc;
+            min-height: 100vh;
+        }
+        .glass-panel {
+            background: rgba(30, 41, 59, 0.75);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .btn-action {
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .btn-action:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(99, 102, 241, 0.4);
+        }
+        .btn-action:active {
+            transform: translateY(0);
+        }
+        .badge-glow {
+            box-shadow: 0 0 15px rgba(234, 179, 8, 0.5);
+        }
+        .drag-item {
+            cursor: grab;
+            user-select: none;
+        }
+        .drag-item:active {
+            cursor: grabbing;
+        }
+        .drop-zone.over {
+            border-color: #6366f1;
+            background: rgba(99, 102, 241, 0.15);
+        }
+    </style>
+</head>
+<body class="flex flex-col min-h-screen">
+
+    <!-- Header Navigation -->
+    <header class="w-full glass-panel sticky top-0 z-50 border-b border-slate-700/50">
+        <div class="max-w-6xl mx-auto px-4 py-3 flex justify-between items-center">
+            <div class="flex items-center space-x-3 cursor-pointer" onclick="showScreen('home')">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-amber-400 to-red-600 flex items-center justify-center font-bold text-white shadow-lg">
+                    🇲🇾
+                </div>
+                <div>
+                    <h1 class="font-extrabold text-lg text-transparent bg-clip-text bg-gradient-to-r from-amber-400 via-red-400 to-indigo-300">
+                        MISI KEDAULATAN
+                    </h1>
+                    <p class="text-xs text-slate-400">MPU Aspirasi Negara Bangsa: Bahagian A</p>
+                </div>
+            </div>
+
+            <!-- Global Score Tracker -->
+            <div class="flex items-center space-x-4">
+                <div class="glass-panel px-4 py-1.5 rounded-full flex items-center space-x-2 border border-amber-500/30">
+                    <i class="fa-solid fa-trophy text-amber-400 text-sm"></i>
+                    <span class="text-xs text-slate-300">Jumlah Skor:</span>
+                    <span id="global-score" class="font-bold text-amber-400">0</span>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <main class="flex-grow max-w-5xl w-full mx-auto p-4 md:p-6 flex flex-col justify-center">
+
+        <!-- 1. HOME / MODE SELECT SCREEN -->
+        <section id="screen-home" class="space-y-8 animate-fade-in">
+            <div class="text-center space-y-4 max-w-2xl mx-auto">
+                <span class="px-4 py-1.5 rounded-full text-xs font-semibold bg-indigo-500/20 text-indigo-300 border border-indigo-500/30">
+                    Koleksi Permainan Interaktif Kelas Degree
+                </span>
+                <h2 class="text-3xl md:text-5xl font-extrabold text-white leading-tight">
+                    Teroka & Uji Kepakaran <span class="text-amber-400">Kedaulatan Malaysia</span>
+                </h2>
+                <p class="text-slate-300 text-sm md:text-base">
+                    Pilih mana-mana cabaran di bawah untuk menguji kefahaman anda tentang Konsep Negara Berdaulat, Ciri Kewilayahan, Demografi & Pembentukan Malaysia.
+                </p>
+            </div>
+
+            <!-- Game Cards Grid -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+
+                <!-- Mode 1 Card -->
+                <div class="glass-panel rounded-2xl p-6 flex flex-col justify-between space-y-4 hover:border-amber-500/50 transition duration-300 group">
+                    <div class="space-y-3">
+                        <div class="w-12 h-12 rounded-xl bg-amber-500/20 border border-amber-500/40 flex items-center justify-center text-amber-400 text-xl font-bold group-hover:scale-110 transition">
+                            <i class="fa-solid fa-bolt"></i>
+                        </div>
+                        <h3 class="text-xl font-bold text-white">Cabaran Kuiz Kilat</h3>
+                        <p class="text-xs text-slate-300 leading-relaxed">
+                            10 soalan objektif berformat ujian pantas. Terkait Tokoh (Jean Bodin, Ibn Khaldun), Konvensyen Montevideo 1933, & Perkara Perlembagaan!
+                        </p>
+                    </div>
+                    <button onclick="startQuizMode()" class="w-full py-3 bg-gradient-to-r from-amber-500 to-orange-600 rounded-xl font-semibold text-white btn-action flex items-center justify-center space-x-2">
+                        <span>Mula Cabaran</span>
+                        <i class="fa-solid fa-arrow-right text-xs"></i>
+                    </button>
+                </div>
+
+                <!-- Mode 2 Card -->
+                <div class="glass-panel rounded-2xl p-6 flex flex-col justify-between space-y-4 hover:border-indigo-500/50 transition duration-300 group">
+                    <div class="space-y-3">
+                        <div class="w-12 h-12 rounded-xl bg-indigo-500/20 border border-indigo-500/40 flex items-center justify-center text-indigo-400 text-xl font-bold group-hover:scale-110 transition">
+                            <i class="fa-solid fa-object-group"></i>
+                        </div>
+                        <h3 class="text-xl font-bold text-white">Pengelas Kedaulatan</h3>
+                        <p class="text-xs text-slate-300 leading-relaxed">
+                            Isih fakta & konsep tepat ke dalam kategori Kedaulatan Dalaman, Kedaulatan Luaran, atau Asas Negara Moden.
+                        </p>
+                    </div>
+                    <button onclick="startClassifyMode()" class="w-full py-3 bg-gradient-to-r from-indigo-600 to-blue-600 rounded-xl font-semibold text-white btn-action flex items-center justify-center space-x-2">
+                        <span>Mula Pengelasan</span>
+                        <i class="fa-solid fa-arrow-right text-xs"></i>
+                    </button>
+                </div>
+
+                <!-- Mode 3 Card -->
+                <div class="glass-panel rounded-2xl p-6 flex flex-col justify-between space-y-4 hover:border-emerald-500/50 transition duration-300 group">
+                    <div class="space-y-3">
+                        <div class="w-12 h-12 rounded-xl bg-emerald-500/20 border border-emerald-500/40 flex items-center justify-center text-emerald-400 text-xl font-bold group-hover:scale-110 transition">
+                            <i class="fa-solid fa-timeline"></i>
+                        </div>
+                        <h3 class="text-xl font-bold text-white">Garis Masa Sejarah</h3>
+                        <p class="text-xs text-slate-300 leading-relaxed">
+                            Susun kronologi penting pembentukan kedaulatan bermula Kesultanan Melaka, Era Penjajahan, Kemerdekaan 1957 hingga MA63.
+                        </p>
+                    </div>
+                    <button onclick="startTimelineMode()" class="w-full py-3 bg-gradient-to-r from-emerald-600 to-teal-600 rounded-xl font-semibold text-white btn-action flex items-center justify-center space-x-2">
+                        <span>Susun Kronologi</span>
+                        <i class="fa-solid fa-arrow-right text-xs"></i>
+                    </button>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- 2. GAME MODE 1: QUIZ -->
+        <section id="screen-quiz" class="hidden space-y-6">
+            <!-- Progress & Timer -->
+            <div class="glass-panel rounded-xl p-4 flex justify-between items-center">
+                <div>
+                    <span class="text-xs text-slate-400 block">Kemajuan Soalan</span>
+                    <span id="quiz-progress" class="font-bold text-indigo-400">Soalan 1 / 10</span>
+                </div>
+                <div class="flex items-center space-x-2">
+                    <i class="fa-solid fa-clock text-amber-400"></i>
+                    <span id="quiz-timer" class="font-mono font-bold text-xl text-amber-400">15s</span>
+                </div>
+            </div>
+
+            <!-- Quiz Box -->
+            <div class="glass-panel rounded-2xl p-6 md:p-8 space-y-6 relative overflow-hidden">
+                <div class="space-y-2">
+                    <span id="quiz-tag" class="px-3 py-1 rounded-full text-xs font-semibold bg-amber-500/20 text-amber-300 border border-amber-500/30">
+                        Konsep Kedaulatan
+                    </span>
+                    <h3 id="quiz-question" class="text-xl md:text-2xl font-bold text-white leading-snug">
+                        Loading question...
+                    </h3>
+                </div>
+
+                <!-- Options Grid -->
+                <div id="quiz-options" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <!-- Options injected dynamically -->
+                </div>
+
+                <!-- Explanation Banner (Hidden initially) -->
+                <div id="quiz-explanation" class="hidden p-4 rounded-xl bg-slate-800/90 border border-indigo-500/40 space-y-2">
+                    <div class="flex items-center space-x-2 text-indigo-400 font-semibold text-sm">
+                        <i class="fa-solid fa-lightbulb"></i>
+                        <span>Info Tambahan Modul Bahagian A:</span>
+                    </div>
+                    <p id="quiz-exp-text" class="text-xs text-slate-300 leading-relaxed"></p>
+                    <button onclick="nextQuizQuestion()" class="mt-2 px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg text-xs font-semibold flex items-center space-x-2">
+                        <span>Soalan Seterusnya</span>
+                        <i class="fa-solid fa-arrow-right"></i>
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- 3. GAME MODE 2: CLASSIFIER -->
+        <section id="screen-classify" class="hidden space-y-6">
+            <div class="glass-panel rounded-xl p-4 flex justify-between items-center">
+                <div>
+                    <h3 class="font-bold text-white text-base">Mod Pengelas Kedaulatan</h3>
+                    <p class="text-xs text-slate-400">Seret (drag) atau klik kad item ke dalam kotak kategori yang betul.</p>
+                </div>
+                <button onclick="checkClassification()" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 rounded-xl text-xs font-bold text-white btn-action">
+                    Semak Jawapan
+                </button>
+            </div>
+
+            <!-- Items Pool -->
+            <div class="glass-panel rounded-xl p-4 space-y-2">
+                <span class="text-xs font-semibold text-slate-400">Senarai Kad Item (Seret/Klik ke Kotak Bawah):</span>
+                <div id="drag-items-pool" class="flex flex-wrap gap-2 min-h-[60px] p-2 bg-slate-900/50 rounded-lg">
+                    <!-- Dynamic drag items -->
+                </div>
+            </div>
+
+            <!-- Drop Zones Grid -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- Zone A -->
+                <div class="glass-panel rounded-2xl p-4 border border-amber-500/30 flex flex-col space-y-3">
+                    <div class="flex justify-between items-center border-b border-slate-700 pb-2">
+                        <h4 class="font-bold text-amber-400 text-sm flex items-center space-x-2">
+                            <i class="fa-solid fa-house-lock"></i>
+                            <span>1. Kedaulatan Dalaman</span>
+                        </h4>
+                        <span class="text-xs text-slate-400">(Hak mentadbir & undang-undang)</span>
+                    </div>
+                    <div id="drop-zone-dalaman" data-zone="dalaman" class="drop-zone flex-grow min-h-[140px] bg-slate-900/40 rounded-xl p-2 flex flex-col gap-2 border-2 border-dashed border-slate-700">
+                    </div>
+                </div>
+
+                <!-- Zone B -->
+                <div class="glass-panel rounded-2xl p-4 border border-indigo-500/30 flex flex-col space-y-3">
+                    <div class="flex justify-between items-center border-b border-slate-700 pb-2">
+                        <h4 class="font-bold text-indigo-400 text-sm flex items-center space-x-2">
+                            <i class="fa-solid fa-globe"></i>
+                            <span>2. Kedaulatan Luaran</span>
+                        </h4>
+                        <span class="text-xs text-slate-400">(Bebas campur tangan & luar negara)</span>
+                    </div>
+                    <div id="drop-zone-luaran" data-zone="luaran" class="drop-zone flex-grow min-h-[140px] bg-slate-900/40 rounded-xl p-2 flex flex-col gap-2 border-2 border-dashed border-slate-700">
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 4. GAME MODE 3: TIMELINE -->
+        <section id="screen-timeline" class="hidden space-y-6">
+            <div class="glass-panel rounded-xl p-4 flex justify-between items-center">
+                <div>
+                    <h3 class="font-bold text-white text-base">Mod Garis Masa Pembentukan Kedaulatan</h3>
+                    <p class="text-xs text-slate-400">Susun peristiwa mengikut urutan kronologi sejarah yang betul dari atas ke bawah.</p>
+                </div>
+                <button onclick="checkTimelineOrder()" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 rounded-xl text-xs font-bold text-white btn-action">
+                    Sahkan Urutan
+                </button>
+            </div>
+
+            <div id="timeline-list" class="space-y-3">
+                <!-- Draggable timeline items injected here -->
+            </div>
+        </section>
+
+        <!-- RESULT SCREEN -->
+        <section id="screen-result" class="hidden space-y-6 text-center py-8">
+            <div class="glass-panel rounded-3xl p-8 max-w-lg mx-auto space-y-6 border border-amber-500/40 relative">
+                <div class="w-20 h-20 mx-auto rounded-full bg-gradient-to-tr from-amber-400 to-yellow-600 flex items-center justify-center text-3xl text-slate-900 shadow-xl badge-glow">
+                    <i class="fa-solid fa-award"></i>
+                </div>
+                
+                <div class="space-y-2">
+                    <h2 class="text-3xl font-extrabold text-white">Tahniah, Graduan!</h2>
+                    <p id="result-message" class="text-xs text-slate-300">Anda telah melengkapkan cabaran topik Malaysia Negara Berdaulat.</p>
+                </div>
+
+                <div class="glass-panel py-4 px-6 rounded-2xl flex justify-around items-center">
+                    <div>
+                        <span class="text-xs text-slate-400 block">Skor Sesi Ini</span>
+                        <span id="result-session-score" class="text-2xl font-black text-amber-400">0</span>
+                    </div>
+                    <div class="w-px h-8 bg-slate-700"></div>
+                    <div>
+                        <span class="text-xs text-slate-400 block">Ketepatan</span>
+                        <span id="result-accuracy" class="text-2xl font-black text-indigo-400">0%</span>
+                    </div>
+                </div>
+
+                <div class="flex flex-col sm:flex-row gap-3">
+                    <button onclick="showScreen('home')" class="flex-1 py-3 bg-slate-700 hover:bg-slate-600 rounded-xl text-xs font-bold text-white transition">
+                        Menu Utama
+                    </button>
+                    <button onclick="restartCurrentGame()" class="flex-1 py-3 bg-indigo-600 hover:bg-indigo-500 rounded-xl text-xs font-bold text-white btn-action">
+                        Main Semula
+                    </button>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="w-full glass-panel py-3 border-t border-slate-800 text-center text-xs text-slate-500">
+        Modul MPU Institut Pendidikan Tinggi Malaysia • Topik 1: Malaysia Negara Berdaulat (Bahagian A)
+    </footer>
+
+    <!-- JavaScript Game Logic -->
+    <script>
+        // GLOBAL STATE
+        let globalScore = 0;
+        let currentGameMode = '';
+
+        // QUIZ DATA (Bahagian A Specific)
+        const quizQuestions = [
+            {
+                tag: "Asas Kedaulatan Moden",
+                question: "Manakah antara berikut MERUPAKAN 4 unsur asas sesebuah negara mengikut Konvensyen Montevideo 1933?",
+                options: [
+                    "Penduduk tetap, Wilayah eksklusif, Kerajaan sah, Autoriti hubungan luar",
+                    "Raja Berperlembagaan, Agama Islam, Bahasa Melayu, Perpaduan etnik",
+                    "Tentera darat, Pasukan polis, Majlis Perbandaran, Penguasaan ekonomi",
+                    "Kemerdekaan 1957, Pembentukan 1963, Rukun Negara, Perlembagaan"
+                ],
+                correct: 0,
+                exp: "Konvensyen Montevideo 1933 menetapkan 4 unsur asas negara: (1) Penduduk tetap, (2) Wilayah eksklusif, (3) Kerajaan yang sah, dan (4) Keupayaan menjalinkan hubungan dengan negara lain (Slaid 9)."
+            },
+            {
+                tag: "Pandangan Tokoh",
+                question: "Apakah takrif kedaulatan mengikut Jean Bodin (1992)?",
+                options: [
+                    "Solidariti sosial dan semangat asabiyyah masyarakat",
+                    "Absolute and perpetual power (kuasa mutlak dan kekal)",
+                    "Keluhuran Perlembagaan Persekutuan sebagai pelan induk",
+                    "Kekuasaan raja-raja Melayu dalam sistem perundangan adat"
+                ],
+                correct: 1,
+                exp: "Jean Bodin mentakrifkan kedaulatan sebagai 'absolute and perpetual power' yang mempunyai autoriti untuk membuat, meminda dan membatalkan undang-undang (Slaid 8)."
+            },
+            {
+                tag: "Pandangan Tokoh",
+                question: "Menurut Ibn Khaldun dalam kitab al-Muqaddimah, kekuatan sesebuah kerajaan banyak bergantung kepada...",
+                options: [
+                    "Kekuatan angkatan tentera laut",
+                    "Jumlah kawasan perairan dan sempadan",
+                    "Solidariti sosial, kesetiaan & kerjasama kolektif rakyat",
+                    "Penguasaan undang-undang penjajah Barat"
+                ],
+                correct: 2,
+                exp: "Ibn Khaldun menekankan bahawa kedaulatan tidak hanya bergantung pada kuasa undang-undang tetapi juga kekuatan sosial yang menyatukan rakyat (Slaid 8)."
+            },
+            {
+                tag: "Kewilayahan Malaysia",
+                question: "Berapakah anggaran luas keseluruhan wilayah pentadbiran Malaysia yang merangkumi 13 negeri dan 3 Wilayah Persekutuan?",
+                options: [
+                    "~132,315 km²",
+                    "~500,000 km²",
+                    "~330,803 km²",
+                    "~74,003 km²"
+                ],
+                correct: 2,
+                exp: "Keluaran wilayah Malaysia ialah ~330,803 km² (Semenanjung: 132,315 km², Sarawak: 124,174 km², Sabah & Labuan: 74,003 km²) dipisahkan oleh Laut China Selatan (Slaid 12)."
+            },
+            {
+                tag: "Demografi 2025",
+                question: "Berapakah jumlah suku etnik yang dirujuk dalam dokumen IPNAS bagi mencerminkan kerencaman masyarakat Malaysia?",
+                options: [
+                    "12 suku etnik",
+                    "50 suku etnik",
+                    "100 suku etnik",
+                    "216 suku etnik"
+                ],
+                correct: 3,
+                exp: "Dokumen IPNAS merujuk kepada 216 suku etnik di Malaysia yang mencerminkan warisan peradaban dan kerencaman demografi negara (Slaid 13)."
+            },
+            {
+                tag: "Perlembagaan Persekutuan",
+                question: "Perkara manakah dalam Perlembagaan Persekutuan yang memperuntukkan bahawa Perlembagaan ialah 'Undang-undang Tertinggi Persekutuan'?",
+                options: [
+                    "Perkara 4(1)",
+                    "Perkara 14",
+                    "Perkara 32",
+                    "Perkara 74"
+                ],
+                correct: 0,
+                exp: "Perkara 4(1) meletakkan Perlembagaan Persekutuan sebagai 'supreme law of the Federation'. Sebarang undang-undang yang bercanggah dengannya adalah terbatal (Slaid 16)."
+            },
+            {
+                tag: "Kewarganegaraan",
+                question: "Hal kewarganegaraan sebagai ikatan sah antara individu dengan negara diperuntukkan dalam Bahagian III Perlembagaan Persekutuan di bawah...",
+                options: [
+                    "Perkara 1 hingga 10",
+                    "Perkara 14 hingga 31A",
+                    "Perkara 39 hingga 44",
+                    "Perkara 121 hingga 132"
+                ],
+                correct: 1,
+                exp: "Bahagian III, Perkara 14 hingga 31A memperuntukkan aspek kewarganegaraan termasuk melalui kuat kuasa undang-undang (Slaid 15)."
+            },
+            {
+                tag: "Struktur Pemerintahan",
+                question: "Kuasa perundangan Persekutuan terletak pada Parlimen mengikut Perkara 44. Parlimen terdiri daripada tiga komponen utama iaitu:",
+                options: [
+                    "Perdana Menteri, Jemaah Menteri, & Penasihat Undang-undang",
+                    "Yang di-Pertuan Agong, Dewan Negara, & Dewan Rakyat",
+                    "Mahkamah Persekutuan, Mahkamah Rayuan, & Mahkamah Tinggi",
+                    "Majlis Raja-Raja, Sultan, & Yang di-Pertua Negeri"
+                ],
+                correct: 1,
+                exp: "Mengikut Perkara 44, Parlimen terdiri daripada Yang di-Pertuan Agong, Dewan Negara, dan Dewan Rakyat (Slaid 16)."
+            },
+            {
+                tag: "Sempadan Laut",
+                question: "Berapakah lebar zon Laut Wilayah (Territorial Sea) bagi Malaysia yang diiktiraf di bawah kedaulatan negara?",
+                options: [
+                    "200 batu nautika",
+                    "12 batu nautika",
+                    "24 batu nautika",
+                    "50 batu nautika"
+                ],
+                correct: 1,
+                exp: "Laut wilayah Malaysia meliputi 12 batu nautika dari garis pangkal sempadan pantai negara (Slaid 12)."
+            },
+            {
+                tag: "Aspek Bahasa",
+                question: "Kata dasar istilah 'Kedaulatan' berasal daripada perkataan 'Daulat' yang merujuk kepada...",
+                options: [
+                    "Kekayaan harta benda & perdagangan maritim",
+                    "Penguasaan wilayah penjajah Barat",
+                    "Kekuasaan, kewibawaan, kemuliaan atau kuasa tertinggi",
+                    "Kesetiaan membabi buta kepada pihak pentadbir"
+                ],
+                correct: 2,
+                exp: "Secara bahasa, 'Daulat' bermaksud kekuasaan, kewibawaan, kemuliaan atau kuasa tertinggi dalam pemerintahan (Slaid 8)."
+            }
+        ];
+
+        let quizIndex = 0;
+        let quizScore = 0;
+        let quizTimer = null;
+        let quizTimeLeft = 15;
+
+        // CLASSIFIER DATA
+        const classifyItemsData = [
+            { id: 1, text: "Menggubal & menguatkuasakan undang-undang tempatan", category: "dalaman" },
+            { id: 2, text: "Bebas daripada penguasaan & campur tangan kuasa asing", category: "luaran" },
+            { id: 3, text: "Mengurus pentadbiran perkhidmatan awam & keselamatan dalam negeri", category: "dalaman" },
+            { id: 4, text: "Menjalinkan hubungan diplomatik & perjanjian antarabangsa", category: "luaran" },
+            { id: 5, text: "Menentukan dasar pembangunan ekonomi nasional", category: "dalaman" },
+            { id: 6, text: "Pengiktirafan rasmi oleh PBB & negara-negara luar", category: "luaran" }
+        ];
+
+        // TIMELINE DATA
+        const timelineDataCorrect = [
+            { id: 1, era: "Abad ke-15", detail: "Kesultanan Melayu Melaka membina tradisi berkerajaan & peradaban maritim." },
+            { id: 2, era: "1511 - 1945", detail: "Era Kolonialisme Barat & Jepun mengubah struktur kedaulatan & masyarakat." },
+            { id: 3, era: "1946 - 1948", detail: "Penentangan Malayan Union & penubuhan Persekutuan Tanah Melayu 1948." },
+            { id: 4, era: "31 Ogos 1957", detail: "Kemerdekaan Persekutuan Tanah Melayu mengiktiraf hak memerintah sendiri." },
+            { id: 5, era: "16 Sept 1963", detail: "Pembentukan Malaysia melibatkan penyertaan Sabah, Sarawak & Singapura." }
+        ];
+        let currentTimelineItems = [];
+
+        // NAVIGATION LOGIC
+        function showScreen(screenId) {
+            document.querySelectorAll('main > section').forEach(el => el.classList.add('hidden'));
+            document.getElementById(`screen-${screenId}`).classList.remove('hidden');
+            if (quizTimer) clearInterval(quizTimer);
+        }
+
+        function updateGlobalScore(points) {
+            globalScore += points;
+            document.getElementById('global-score').textContent = globalScore;
+        }
+
+        // ==========================================
+        // MODE 1: QUIZ GAME LOGIC
+        // ==========================================
+        function startQuizMode() {
+            currentGameMode = 'quiz';
+            quizIndex = 0;
+            quizScore = 0;
+            showScreen('quiz');
+            loadQuizQuestion();
+        }
+
+        function loadQuizQuestion() {
+            if (quizIndex >= quizQuestions.length) {
+                endQuizGame();
+                return;
+            }
+
+            const q = quizQuestions[quizIndex];
+            document.getElementById('quiz-progress').textContent = `Soalan ${quizIndex + 1} / ${quizQuestions.length}`;
+            document.getElementById('quiz-tag').textContent = q.tag;
+            document.getElementById('quiz-question').textContent = q.question;
+            document.getElementById('quiz-explanation').classList.add('hidden');
+
+            const optionsContainer = document.getElementById('quiz-options');
+            optionsContainer.innerHTML = '';
+
+            q.options.forEach((opt, idx) => {
+                const btn = document.createElement('button');
+                btn.className = 'w-full text-left p-4 rounded-xl bg-slate-800/80 hover:bg-slate-700/80 border border-slate-700 text-slate-200 text-sm font-medium transition duration-200 flex items-center space-x-3';
+                btn.innerHTML = `
+                    <span class="w-6 h-6 rounded-full bg-slate-700 flex items-center justify-center text-xs font-bold text-slate-300 flex-shrink-0">${String.fromCharCode(65 + idx)}</span>
+                    <span>${opt}</span>
+                `;
+                btn.onclick = () => selectQuizOption(idx);
+                optionsContainer.appendChild(btn);
+            });
+
+            // Start Timer
+            quizTimeLeft = 15;
+            document.getElementById('quiz-timer').textContent = `${quizTimeLeft}s`;
+            if (quizTimer) clearInterval(quizTimer);
+            quizTimer = setInterval(() => {
+                quizTimeLeft--;
+                document.getElementById('quiz-timer').textContent = `${quizTimeLeft}s`;
+                if (quizTimeLeft <= 0) {
+                    clearInterval(quizTimer);
+                    selectQuizOption(-1); // Time out
+                }
+            }, 1000);
+        }
+
+        function selectQuizOption(selectedIndex) {
+            clearInterval(quizTimer);
+            const q = quizQuestions[quizIndex];
+            const optionsBtns = document.getElementById('quiz-options').children;
+
+            // Disable all buttons
+            for (let btn of optionsBtns) {
+                btn.disabled = true;
+                btn.classList.add('cursor-not-allowed');
+            }
+
+            if (selectedIndex === q.correct) {
+                if (selectedIndex !== -1) {
+                    optionsBtns[selectedIndex].classList.remove('bg-slate-800/80', 'border-slate-700');
+                    optionsBtns[selectedIndex].classList.add('bg-emerald-600/30', 'border-emerald-500', 'text-emerald-200');
+                }
+                quizScore += 10;
+                updateGlobalScore(10);
+            } else {
+                if (selectedIndex !== -1) {
+                    optionsBtns[selectedIndex].classList.remove('bg-slate-800/80', 'border-slate-700');
+                    optionsBtns[selectedIndex].classList.add('bg-rose-600/30', 'border-rose-500', 'text-rose-200');
+                }
+                // Highlight correct one
+                optionsBtns[q.correct].classList.remove('bg-slate-800/80', 'border-slate-700');
+                optionsBtns[q.correct].classList.add('bg-emerald-600/30', 'border-emerald-500', 'text-emerald-200');
+            }
+
+            // Show explanation
+            document.getElementById('quiz-exp-text').textContent = q.exp;
+            document.getElementById('quiz-explanation').classList.remove('hidden');
+        }
+
+        function nextQuizQuestion() {
+            quizIndex++;
+            loadQuizQuestion();
+        }
+
+        function endQuizGame() {
+            showResultScreen(quizScore, (quizScore / (quizQuestions.length * 10)) * 100);
+        }
+
+        // ==========================================
+        // MODE 2: CLASSIFIER LOGIC
+        // ==========================================
+        function startClassifyMode() {
+            currentGameMode = 'classify';
+            showScreen('classify');
+            initClassifier();
+        }
+
+        function initClassifier() {
+            const pool = document.getElementById('drag-items-pool');
+            const zoneDalaman = document.getElementById('drop-zone-dalaman');
+            const zoneLuaran = document.getElementById('drop-zone-luaran');
+
+            pool.innerHTML = '';
+            zoneDalaman.innerHTML = '';
+            zoneLuaran.innerHTML = '';
+
+            // Shuffle items
+            const shuffled = [...classifyItemsData].sort(() => Math.random() - 0.5);
+
+            shuffled.forEach(item => {
+                const el = document.createElement('div');
+                el.id = `drag-item-${item.id}`;
+                el.dataset.id = item.id;
+                el.dataset.category = item.category;
+                el.className = 'drag-item bg-slate-800 hover:bg-slate-700 border border-slate-600 text-slate-200 text-xs px-3 py-2 rounded-lg shadow-sm transition';
+                el.textContent = item.text;
+
+                // Click to move fallback for mobile ease
+                el.onclick = () => autoMoveItem(el);
+
+                pool.appendChild(el);
+            });
+        }
+
+        function autoMoveItem(el) {
+            const pool = document.getElementById('drag-items-pool');
+            const zoneDalaman = document.getElementById('drop-zone-dalaman');
+            const zoneLuaran = document.getElementById('drop-zone-luaran');
+
+            if (el.parentElement === pool) {
+                // If item is in pool, default move to Dalaman
+                zoneDalaman.appendChild(el);
+            } else if (el.parentElement === zoneDalaman) {
+                // Move to Luaran
+                zoneLuaran.appendChild(el);
+            } else {
+                // Return to pool
+                pool.appendChild(el);
+            }
+        }
+
+        function checkClassification() {
+            const zoneDalaman = document.getElementById('drop-zone-dalaman');
+            const zoneLuaran = document.getElementById('drop-zone-luaran');
+
+            let correctCount = 0;
+            const total = classifyItemsData.length;
+
+            // Check Dalaman
+            Array.from(zoneDalaman.children).forEach(el => {
+                if (el.dataset.category === 'dalaman') {
+                    correctCount++;
+                    el.classList.add('border-emerald-500', 'bg-emerald-950/40');
+                } else {
+                    el.classList.add('border-rose-500', 'bg-rose-950/40');
+                }
+            });
+
+            // Check Luaran
+            Array.from(zoneLuaran.children).forEach(el => {
+                if (el.dataset.category === 'luaran') {
+                    correctCount++;
+                    el.classList.add('border-emerald-500', 'bg-emerald-950/40');
+                } else {
+                    el.classList.add('border-rose-500', 'bg-rose-950/40');
+                }
+            });
+
+            const points = correctCount * 10;
+            updateGlobalScore(points);
+
+            setTimeout(() => {
+                showResultScreen(points, (correctCount / total) * 100);
+            }, 1200);
+        }
+
+        // ==========================================
+        // MODE 3: TIMELINE LOGIC
+        // ==========================================
+        function startTimelineMode() {
+            currentGameMode = 'timeline';
+            showScreen('timeline');
+            initTimeline();
+        }
+
+        function initTimeline() {
+            const container = document.getElementById('timeline-list');
+            container.innerHTML = '';
+
+            // Shuffle timeline items
+            currentTimelineItems = [...timelineDataCorrect].sort(() => Math.random() - 0.5);
+
+            renderTimelineItems();
+        }
+
+        function renderTimelineItems() {
+            const container = document.getElementById('timeline-list');
+            container.innerHTML = '';
+
+            currentTimelineItems.forEach((item, index) => {
+                const el = document.createElement('div');
+                el.className = 'glass-panel p-4 rounded-xl flex items-center justify-between space-x-4 border border-slate-700/80';
+                el.innerHTML = `
+                    <div class="flex items-center space-x-3">
+                        <span class="w-7 h-7 rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/40 font-bold text-xs flex items-center justify-center">
+                            ${index + 1}
+                        </span>
+                        <div>
+                            <span class="text-xs font-bold text-amber-400 block">${item.era}</span>
+                            <p class="text-xs text-slate-200">${item.detail}</p>
+                        </div>
+                    </div>
+                    <div class="flex flex-col space-y-1">
+                        <button onclick="moveTimeline(${index}, -1)" ${index === 0 ? 'disabled class="opacity-30"' : ''} class="p-1.5 bg-slate-800 hover:bg-slate-700 rounded text-xs text-slate-300">
+                            <i class="fa-solid fa-chevron-up"></i>
+                        </button>
+                        <button onclick="moveTimeline(${index}, 1)" ${index === currentTimelineItems.length - 1 ? 'disabled class="opacity-30"' : ''} class="p-1.5 bg-slate-800 hover:bg-slate-700 rounded text-xs text-slate-300">
+                            <i class="fa-solid fa-chevron-down"></i>
+                        </button>
+                    </div>
+                `;
+                container.appendChild(el);
+            });
+        }
+
+        function moveTimeline(index, direction) {
+            const targetIndex = index + direction;
+            if (targetIndex < 0 || targetIndex >= currentTimelineItems.length) return;
+
+            const temp = currentTimelineItems[index];
+            currentTimelineItems[index] = currentTimelineItems[targetIndex];
+            currentTimelineItems[targetIndex] = temp;
+
+            renderTimelineItems();
+        }
+
+        function checkTimelineOrder() {
+            let correctCount = 0;
+            currentTimelineItems.forEach((item, idx) => {
+                if (item.id === timelineDataCorrect[idx].id) {
+                    correctCount++;
+                }
+            });
+
+            const accuracy = (correctCount / timelineDataCorrect.length) * 100;
+            const points = correctCount * 15;
+            updateGlobalScore(points);
+
+            showResultScreen(points, accuracy);
+        }
+
+        // ==========================================
+        // RESULT SCREEN & RESTART LOGIC
+        // ==========================================
+        function showResultScreen(sessionScore, accuracy) {
+            showScreen('result');
+            document.getElementById('result-session-score').textContent = sessionScore;
+            document.getElementById('result-accuracy').textContent = `${Math.round(accuracy)}%`;
+
+            let msg = "Terus berusaha untuk menguasai topik kedaulatan negara!";
+            if (accuracy >= 80) {
+                msg = "Cemerlang! Anda sangat memahami konsep kedaulatan, undang-undang & garis masa sejarah Malaysia!";
+                confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 } });
+            } else if (accuracy >= 50) {
+                msg = "Syabas! Usaha yang baik, semak semula beberapa isi penting Perlembagaan dan Tokoh.";
+            }
+            document.getElementById('result-message').textContent = msg;
+        }
+
+        function restartCurrentGame() {
+            if (currentGameMode === 'quiz') startQuizMode();
+            else if (currentGameMode === 'classify') startClassifyMode();
+            else if (currentGameMode === 'timeline') startTimelineMode();
+            else showScreen('home');
+        }
+    </script>
+</body>
+</html>
+```eof
+
+### 🎯 Kenapa Aplikasi Game Ini Berkesan & Tidak Membosankan Pelajar Degree?
+
+1. **3 Mod Permainan Pelbagai (Multi-mode)**: Pelajar tidak hanya menjawab soalan pilihan ganda, malah bertindak aktif mengisih fakta (*Classifier*) dan menyusun urutan garis masa sejarah (*Timeline Matcher*).
+2. **Kandungan Tepat Modul Bahagian A**: Memuatkan isi penting khusus daripada slaid (Tokoh Bodin/Ibn Khaldun, Konvensyen Montevideo 1933, Demografi 2025 dengan 216 etnik, Perkara 4(1), Perkara 44, sertaMA63).
+3. **Maklum Balas Serta-Merta (Instant Feedback)**: Setiap soalan menyediakan **Info Tambahan** untuk mengukuhkan kefahaman teori (bukan sekadar menghafal jawapan).
+4. **Elemen Gamifikasi Moden**: Dilengkapi dengan julat skor global, pemasa (*timer*), penunjuk kemajuan, dan kesan konfeti apabila mencapai keputusan cemerlang.
+5. **Mesra Peranti (Responsive Design)**: Boleh dimainkan di telefon bimbit, tablet, mahupun laptop/komputer dalam kelas.
